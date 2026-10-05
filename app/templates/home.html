@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero con buscador -->
+<section class="ae-hero text-center">
+  <div class="container">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="AeternaLib" class="mb-3">
+    <h1 class="display-5">Tu biblioteca digital</h1>
+    <p class="lead mb-4">Busca, presta y gestiona libros de forma rápida y sencilla.</p>
+
+    <form action="{{ url_for('books.index') }}" method="get" class="ae-search mx-auto">
+      <div class="input-group input-group-lg">
+        <input type="text" name="q" class="form-control" placeholder="Buscar por título o autor...">
+        <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+
+    <div class="mt-4">
+      <a href="{{ url_for('books.index') }}" class="btn btn-ae-outline btn-lg">Ver catálogo</a>
+    </div>
+  </div>
+</section>
+
+<!-- Estadísticas -->
+<section class="ae-stats py-4">
+  <div class="container">
+    <div class="row text-center g-3">
+      <div class="col-6 col-md-3">
+        <div class="ae-stat-number">{{ stats.books }}</div>
+        <div>Libros</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ae-stat-number">{{ stats.users }}</div>
+        <div>Lectores</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ae-stat-number">{{ stats.active_loans }}</div>
+        <div>Préstamos activos</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ae-stat-number">{{ stats.overdue }}</div>
+        <div>Atrasados</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Accesos rápidos -->
+<section class="container mt-5">
+  <h3 class="mb-4 text-center">¿Qué quieres hacer?</h3>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <a href="{{ url_for('books.index') }}" class="text-decoration-none">
+        <div class="ae-card p-4 text-center">
+          <div class="icon"><i class="bi bi-journal-bookmark"></i></div>
+          <h5 class="mt-2">Libros</h5>
+          <p class="text-muted mb-0">Consulta y administra el catálogo.</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="ae-card p-4 text-center">
+        <div class="icon"><i class="bi bi-person-lines-fill"></i></div>
+        <h5 class="mt-2">Autores</h5>
+        <p class="text-muted mb-0">Datos biográficos y bibliográficos.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="ae-card p-4 text-center">
+        <div class="icon"><i class="bi bi-people"></i></div>
+        <h5 class="mt-2">Usuarios</h5>
+        <p class="text-muted mb-0">Registro de lectores.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="ae-card p-4 text-center">
+        <div class="icon"><i class="bi bi-arrow-left-right"></i></div>
+        <h5 class="mt-2">Préstamos</h5>
+        <p class="text-muted mb-0">Salidas, devoluciones e historial.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

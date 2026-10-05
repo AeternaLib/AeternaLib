@@ -1,0 +1,109 @@
+:root {
+  --ae-blue: #0a365d;
+  --ae-blue-dark: #07294a;
+  --ae-blue-light: #1b5a94;
+  --ae-soft: #eef3f9;
+  --ae-white: #ffffff;
+}
+
+body {
+  background: var(--ae-white);
+  color: var(--ae-blue);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* Navbar */
+.ae-navbar {
+  background: var(--ae-blue);
+}
+.ae-navbar .navbar-brand,
+.ae-navbar .nav-link {
+  color: var(--ae-white);
+}
+.ae-navbar .nav-link {
+  opacity: 0.85;
+}
+.ae-navbar .nav-link:hover,
+.ae-navbar .nav-link.active {
+  opacity: 1;
+  border-bottom: 2px solid var(--ae-white);
+}
+
+/* Botones */
+.btn-ae {
+  background: var(--ae-blue);
+  color: var(--ae-white);
+  border: 2px solid var(--ae-blue);
+}
+.btn-ae:hover {
+  background: var(--ae-blue-dark);
+  color: var(--ae-white);
+}
+.btn-ae-outline {
+  background: transparent;
+  color: var(--ae-white);
+  border: 2px solid var(--ae-white);
+}
+.btn-ae-outline:hover {
+  background: var(--ae-white);
+  color: var(--ae-blue);
+}
+
+/* Hero */
+.ae-hero {
+  background: linear-gradient(135deg, var(--ae-blue) 0%, var(--ae-blue-dark) 100%);
+  color: var(--ae-white);
+  padding: 4rem 0 5rem;
+}
+.ae-hero img {
+  max-width: 220px;
+}
+.ae-hero h1 {
+  font-weight: 700;
+}
+.ae-search {
+  max-width: 640px;
+}
+
+/* Tarjetas de acceso rápido */
+.ae-card {
+  border: 1px solid #d9e3ef;
+  border-radius: 14px;
+  background: var(--ae-white);
+  transition: transform 0.15s, box-shadow 0.15s;
+  height: 100%;
+}
+.ae-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(10, 54, 93, 0.15);
+}
+.ae-card .icon {
+  font-size: 2.2rem;
+}
+
+/* Estadísticas */
+.ae-stats {
+  background: var(--ae-soft);
+}
+.ae-stat-number {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--ae-blue);
+}
+
+/* Footer */
+.ae-footer {
+  background: var(--ae-blue);
+  color: var(--ae-white);
+  opacity: 0.95;
+}
+
+/* Tablas y formularios (para el resto de páginas) */
+.table thead {
+  background: var(--ae-blue);
+  color: var(--ae-white);
+}
+.form-control:focus {
+  border-color: var(--ae-blue-light);
+  box-shadow: 0 0 0 0.2rem rgba(10, 54, 93, 0.2);
+}
