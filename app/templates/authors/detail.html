@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ author.name }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 800px;">
+  <div class="ae-page-header">
+    <div>
+      <h2>{{ author.name }}</h2>
+      <span class="text-muted">
+        {{ author.nationality or 'Nacionalidad no registrada' }}
+        {% if author.birth_date %}· {{ author.birth_date.strftime('%d/%m/%Y') }}{% endif %}
+      </span>
+    </div>
+    <a href="{{ url_for('authors.edit', author_id=author.id) }}" class="btn btn-ae">
+      <i class="bi bi-pencil"></i> Editar
+    </a>
+  </div>
+
+  <div class="ae-form-card">
+    <h5>Biografía</h5>
+    <p>{{ author.biography or 'Sin biografía registrada.' }}</p>
+
+    <h5>Bibliografía</h5>
+    <p>{{ author.bibliography or 'Sin bibliografía registrada.' }}</p>
+
+    <h5>Libros en el catálogo</h5>
+    <ul class="mb-0">
+      {% for b in author.books %}
+      <li>{{ b.title }} ({{ b.year or 's. f.' }})</li>
+      {% else %}
+      <li class="text-muted">Este autor aún no tiene libros asociados.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <a href="{{ url_for('authors.index') }}" class="d-inline-block mt-3">← Volver a autores</a>
+</div>
+{% endblock %}

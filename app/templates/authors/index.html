@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Autores · AeternaLib{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="ae-page-header">
+    <h2>Autores</h2>
+    <a href="{{ url_for('authors.create') }}" class="btn btn-ae">
+      <i class="bi bi-plus-lg"></i> Nuevo autor
+    </a>
+  </div>
+
+  <div class="ae-table-wrap">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Nacionalidad</th>
+            <th>Nacimiento</th>
+            <th class="text-center">Libros</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in authors %}
+          <tr>
+            <td><a class="fw-semibold text-decoration-none" href="{{ url_for('authors.detail', author_id=a.id) }}">{{
+                a.name }}</a></td>
+            <td>{{ a.nationality or '—' }}</td>
+            <td>{{ a.birth_date.strftime('%d/%m/%Y') if a.birth_date else '—' }}</td>
+            <td class="text-center">{{ a.books | length }}</td>
+            <td class="text-end text-nowrap">
+              <a href="{{ url_for('authors.edit', author_id=a.id) }}" class="btn btn-sm btn-ae-light">
+                <i class="bi bi-pencil"></i> Editar
+              </a>
+              <form method="post" action="{{ url_for('authors.delete', author_id=a.id) }}"
+                class="d-inline js-confirm-delete" data-name="{{ a.name }}">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-5">
+              <i class="bi bi-person-lines-fill fs-3 d-block mb-2"></i>
+              No hay autores registrados todavía
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDelete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content ae-modal">
+      <div class="modal-body text-center p-4">
+        <div class="ae-modal-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <h5 class="mb-2">¿Eliminar autor?</h5>
+        <p class="text-muted mb-4" id="confirmDeleteText"></p>
+        <button type="button" class="btn btn-ae-light" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('confirmDelete'));
+    var text = document.getElementById('confirmDeleteText');
+    var pending = null;
+
+    document.querySelectorAll('.js-confirm-delete').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        pending = form;
+        text.textContent = 'Vas a eliminar a "' + form.dataset.name +
+          '". Esta acción no se puede deshacer. Sus libros seguirán en el catálogo.';
+        modal.show();
+      });
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+      if (pending) pending.submit();
+    });
+  });
+</script>
+
+{% endblock %}
