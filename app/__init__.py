@@ -18,10 +18,10 @@ def create_app(config=Config):
     app.register_blueprint(books_bp)
 
     # Activa estos cuando cada controlador defina su `bp`:
-    # from .controllers.author_controller import bp as authors_bp
+    from .controllers.author_controller import bp as authors_bp
     # from .controllers.user_controller import bp as users_bp
     # from .controllers.loan_controller import bp as loans_bp
-    # app.register_blueprint(authors_bp)
+    app.register_blueprint(authors_bp)
     # app.register_blueprint(users_bp)
     # app.register_blueprint(loans_bp)
 
@@ -43,7 +43,15 @@ def create_app(config=Config):
     @app.errorhandler(AeternaError)
     def handle_domain_error(e):
         return render_template("error.html", message=e.message), e.status_code
+    
+    @app.errorhandler(404)
+    def handle_not_found(e):
+        return render_template("error.html", message="La página que buscas no existe"), 404
 
+    @app.errorhandler(405)
+    def handle_method_not_allowed(e):
+        return render_template("error.html", message="Esa acción no está permitida desde el navegador"), 405
+    
     # Crear tablas
     with app.app_context():
         from . import models  # noqa

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar autor' if author else 'Nuevo autor' }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+  <div class="ae-page-header">
+    <h2>{{ 'Editar autor' if author else 'Nuevo autor' }}</h2>
+  </div>
+
+  <div class="ae-form-card">
+    <form method="post"
+          action="{{ url_for('authors.edit', author_id=author.id) if author else url_for('authors.create') }}">
+      <div class="mb-3">
+        <label class="form-label">Nombre *</label>
+        <input class="form-control" name="name" required value="{{ author.name if author else '' }}">
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Nacionalidad</label>
+          <input class="form-control" name="nationality" value="{{ author.nationality or '' if author else '' }}">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Fecha de nacimiento</label>
+          <input type="date" class="form-control" name="birth_date" max="{{ today }}"
+                 value="{{ author.birth_date.isoformat() if author and author.birth_date else '' }}">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Biografía</label>
+        <textarea class="form-control" name="biography" rows="4">{{ author.biography or '' if author else '' }}</textarea>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Bibliografía</label>
+        <textarea class="form-control" name="bibliography" rows="4">{{ author.bibliography or '' if author else '' }}</textarea>
+      </div>
+
+      <button class="btn btn-ae"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{{ url_for('authors.index') }}" class="btn btn-ae-light">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
