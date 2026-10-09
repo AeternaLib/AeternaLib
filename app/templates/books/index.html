@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Libros · AeternaLib{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="ae-page-header">
+    <h2>Libros</h2>
+    <a href="{{ url_for('books.create') }}" class="btn btn-ae">
+      <i class="bi bi-plus-lg"></i> Nuevo libro
+    </a>
+  </div>
+
+  <form class="row g-2 mb-4" method="get">
+    <div class="col-md-6">
+      <input class="form-control" name="q" placeholder="Buscar por título, autor, ISBN o editorial"
+             value="{{ request.args.get('q', '') }}">
+    </div>
+    <div class="col-md-4">
+      <input class="form-control" name="genre" placeholder="Género"
+             value="{{ request.args.get('genre', '') }}">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-ae w-100"><i class="bi bi-search"></i> Buscar</button>
+    </div>
+  </form>
+
+  <div class="ae-table-wrap">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Título</th><th>Autor(es)</th><th>Ediciones</th><th>Género</th>
+            <th class="text-center">Disponibles</th><th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in books %}
+          <tr>
+            <td><a class="fw-semibold text-decoration-none" href="{{ url_for('books.detail', book_id=b.id) }}">{{ b.title }}</a></td>
+            <td>{{ b.authors | map(attribute='name') | join(', ') or '—' }}</td>
+            <td>
+              {% set n = b.editions | length %}
+              <span class="badge bg-secondary-subtle text-secondary-emphasis">
+                {{ n }} edición{{ '' if n == 1 else 'es' }}
+              </span>
+            </td>
+            <td>{{ b.genre or '—' }}</td>
+            <td class="text-center">
+              <span class="badge {{ 'bg-success' if b.is_available else 'bg-danger' }}">
+                {{ b.available_copies }}/{{ b.total_copies }}
+              </span>
+            </td>
+            <td class="text-end text-nowrap">
+              <a href="{{ url_for('books.edit', book_id=b.id) }}" class="btn btn-sm btn-ae-light">
+                <i class="bi bi-pencil"></i> Editar
+              </a>
+              <form method="post" action="{{ url_for('books.delete', book_id=b.id) }}"
+                    class="d-inline js-confirm-delete" data-name="{{ b.title }}">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-5">
+              <i class="bi bi-journal-bookmark fs-3 d-block mb-2"></i>
+              No hay libros registrados todavía
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDelete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content ae-modal">
+      <div class="modal-body text-center p-4">
+        <div class="ae-modal-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <h5 class="mb-2">¿Eliminar libro?</h5>
+        <p class="text-muted mb-4" id="confirmDeleteText"></p>
+        <button type="button" class="btn btn-ae-light" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var modal = new bootstrap.Modal(document.getElementById('confirmDelete'));
+    var text = document.getElementById('confirmDeleteText');
+    var pending = null;
+
+    document.querySelectorAll('.js-confirm-delete').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        pending = form;
+        text.textContent = 'Vas a eliminar "' + form.dataset.name + '". Esta acción no se puede deshacer.';
+        modal.show();
+      });
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+      if (pending) pending.submit();
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% macro price(value) %}${{ '{:,.0f}'.format(value).replace(',', '.') }}{% endmacro %}
+
+{% macro cover(edition, height='260px') %}
+<div class="ae-cover-box" style="--cover-h: {{ height }};">
+  <img src="{{ edition.cover_src }}" alt="Portada de {{ edition.book.title }}"
+       class="ae-cover" loading="lazy"
+       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+  <div class="ae-cover ae-cover-empty" style="display: none;">
+    <div class="text-center px-3">
+      <i class="bi bi-book fs-1 d-block mb-2"></i>
+      <small>{{ edition.book.title }}</small>
+    </div>
+  </div>
+</div>
+{% endmacro %}

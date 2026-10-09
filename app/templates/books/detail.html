@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 900px;">
+  <div class="ae-page-header">
+    <div>
+      <h2>{{ book.title }}</h2>
+      <span class="text-muted">
+        {{ book.genre or 'Género no registrado' }}{% if book.year %} · {{ book.year }}{% endif %}
+      </span>
+    </div>
+    <a href="{{ url_for('books.edit', book_id=book.id) }}" class="btn btn-ae">
+      <i class="bi bi-pencil"></i> Editar
+    </a>
+  </div>
+
+  <div class="ae-form-card">
+    <div class="mb-4">
+      <h6 class="text-muted mb-1">Disponibilidad total</h6>
+      <span class="badge {{ 'bg-success' if book.is_available else 'bg-danger' }}">
+        {{ book.available_copies }} de {{ book.total_copies }} disponibles
+      </span>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Ediciones</h5>
+      <a href="{{ url_for('books.edition_create', book_id=book.id) }}" class="btn btn-sm btn-ae">
+        <i class="bi bi-plus-lg"></i> Agregar edición
+      </a>
+    </div>
+
+    <div class="table-responsive mb-4">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Editorial</th><th>Año</th><th>ISBN-13</th><th>ISBN-10</th>
+            <th class="text-center">Disponibles</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in book.editions %}
+          <tr>
+            <td>{{ e.publisher or '—' }}</td>
+            <td>{{ e.edition_year or '—' }}</td>
+            <td>{{ e.isbn_13 }}</td>
+            <td>{{ e.isbn_10 or '—' }}</td>
+            <td class="text-center">
+              <span class="badge {{ 'bg-success' if e.available_copies else 'bg-danger' }}">
+                {{ e.available_copies }}/{{ e.total_copies }}
+              </span>
+            </td>
+            <td class="text-end text-nowrap">
+              <a href="{{ url_for('books.edition_edit', edition_id=e.id) }}" class="btn btn-sm btn-ae-light">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="post" action="{{ url_for('books.edition_delete', edition_id=e.id) }}"
+                    class="d-inline" onsubmit="return confirm('¿Eliminar esta edición?')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-muted text-center py-3">Aún no hay ediciones registradas.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h5>Autores</h5>
+    <ul class="mb-0">
+      {% for a in book.authors %}
+      <li><a href="{{ url_for('authors.detail', author_id=a.id) }}">{{ a.name }}</a></li>
+      {% else %}
+      <li class="text-muted">Este libro aún no tiene autores asociados.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <a href="{{ url_for('books.index') }}" class="d-inline-block mt-3">← Volver a libros</a>
+</div>
+{% endblock %}

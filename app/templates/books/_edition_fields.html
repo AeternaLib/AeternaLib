@@ -1,0 +1,44 @@
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <label class="form-label">ISBN (10 o 13 dígitos) *</label>
+    <input class="form-control" name="isbn" required placeholder="978-84-264-3129-5"
+           value="{{ edition.isbn_13 if edition else '' }}">
+  </div>
+  <div class="col-md-6 mb-3">
+    <label class="form-label">Editorial</label>
+    <input class="form-control" name="publisher"
+           value="{{ edition.publisher or '' if edition else '' }}">
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <label class="form-label">Año de la edición</label>
+    <input type="number" class="form-control" name="edition_year" min="0" max="{{ current_year }}"
+           value="{{ edition.edition_year if edition and edition.edition_year else '' }}">
+  </div>
+  <div class="col-md-6 mb-3">
+    <label class="form-label">URL de la portada</label>
+    <input type="url" class="form-control" name="cover_url" placeholder="https://..."
+           value="{{ edition.cover_url or '' if edition else '' }}">
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4 mb-3">
+    <label class="form-label">Precio (COP) *</label>
+    <input type="number" class="form-control" name="price" required min="0" step="100"
+           value="{{ edition.price if edition else 0 }}">
+  </div>
+  <div class="col-md-4 mb-3">
+    <label class="form-label">Descuento (%)</label>
+    <input type="number" class="form-control" name="discount_percent" min="0" max="90"
+           value="{{ edition.discount_percent if edition else 0 }}">
+  </div>
+  <div class="col-md-4 mb-4">
+    <label class="form-label">Ejemplares *</label>
+    <input type="number" class="form-control" name="total_copies" required min="{{ loaned }}"
+           value="{{ edition.total_copies if edition else 1 }}">
+    {% if edition and loaned %}
+    <div class="form-text">Hay {{ loaned }} prestado(s); no puedes bajar de esa cantidad.</div>
+    {% endif %}
+  </div>
+</div>

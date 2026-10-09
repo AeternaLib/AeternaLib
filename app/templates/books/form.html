@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar libro' if book else 'Nuevo libro' }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+  <div class="ae-page-header">
+    <h2>{{ 'Editar libro' if book else 'Nuevo libro' }}</h2>
+  </div>
+
+  <div class="ae-form-card">
+    <form method="post"
+          action="{{ url_for('books.edit', book_id=book.id) if book else url_for('books.create') }}">
+      <div class="mb-3">
+        <label class="form-label">Título *</label>
+        <input class="form-control" name="title" required value="{{ book.title if book else '' }}">
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Género</label>
+          <input class="form-control" name="genre" value="{{ book.genre or '' if book else '' }}">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Año de publicación original</label>
+          <input type="number" class="form-control" name="year" min="0" max="{{ current_year }}"
+                 value="{{ book.year if book and book.year else '' }}">
+        </div>
+      </div>
+
+      {% if not book %}
+      <hr>
+      <h6 class="text-muted mb-3">Primera edición</h6>
+      {% with edition=None, loaned=0 %}
+        {% include "books/_edition_fields.html" %}
+      {% endwith %}
+      {% else %}
+      <div class="mb-4"></div>
+      {% endif %}
+
+      <button class="btn btn-ae"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{{ url_for('books.index') if not book else url_for('books.detail', book_id=book.id) }}"
+         class="btn btn-ae-light">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

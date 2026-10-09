@@ -17,6 +17,9 @@ def create_app(config=Config):
     from .controllers.book_controller import bp as books_bp
     app.register_blueprint(books_bp)
 
+    from app.controllers.catalog_controller import bp as catalog_bp
+    app.register_blueprint(catalog_bp)
+
     # Activa estos cuando cada controlador defina su `bp`:
     from .controllers.author_controller import bp as authors_bp
     # from .controllers.user_controller import bp as users_bp
