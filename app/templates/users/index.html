@@ -56,8 +56,12 @@
                 <i class="bi bi-pencil"></i> Editar
               </a>
               <form method="post" action="{{ url_for('users.delete', user_id=u.id) }}"
-                    class="d-inline js-confirm-delete" data-name="{{ u.name }}">
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    class="d-inline js-confirm-action"
+                    data-confirm-title="¿Eliminar usuario?"
+                    data-confirm-message="Vas a eliminar a {{ u.name }}. Esta acción no se puede deshacer.">
+                <button class="btn btn-sm btn-outline-danger" aria-label="Eliminar usuario {{ u.name }}">
+                  <i class="bi bi-trash"></i>
+                </button>
               </form>
             </td>
           </tr>
@@ -75,38 +79,4 @@
   </div>
 </div>
 
-<div class="modal fade" id="confirmDelete" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content ae-modal">
-      <div class="modal-body text-center p-4">
-        <div class="ae-modal-icon"><i class="bi bi-exclamation-triangle"></i></div>
-        <h5 class="mb-2">¿Eliminar usuario?</h5>
-        <p class="text-muted mb-4" id="confirmDeleteText"></p>
-        <button type="button" class="btn btn-ae-light" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Sí, eliminar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var modal = new bootstrap.Modal(document.getElementById('confirmDelete'));
-    var text = document.getElementById('confirmDeleteText');
-    var pending = null;
-
-    document.querySelectorAll('.js-confirm-delete').forEach(function (form) {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        pending = form;
-        text.textContent = 'Vas a eliminar a "' + form.dataset.name + '". Esta acción no se puede deshacer.';
-        modal.show();
-      });
-    });
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-      if (pending) pending.submit();
-    });
-  });
-</script>
 {% endblock %}

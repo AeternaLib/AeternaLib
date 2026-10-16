@@ -81,8 +81,10 @@ def delete(user_id):
     user = User.get_or_fail(user_id)
     if user.id == current_user().id:
         raise ValidationError("No puedes eliminar tu propia cuenta")
+    if user.active_loans:
+        raise ValidationError("No se puede eliminar un usuario con préstamos activos")
     if user.loans:
-        raise ValidationError("No se puede eliminar un usuario que tiene préstamos asociados")
+        raise ValidationError("No se puede eliminar un usuario con historial de préstamos")
     if user.is_admin and User.count_admins() <= 1:
         raise ValidationError("No puedes eliminar al único administrador")
     user.delete()

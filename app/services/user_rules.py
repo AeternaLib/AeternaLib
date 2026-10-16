@@ -2,7 +2,11 @@ import re
 from app.exceptions import ValidationError
 from app.models.user import User
 
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+EMAIL_RE = re.compile(
+    r"^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+    r"(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,63}$",
+    re.IGNORECASE,
+)
 PHONE_RE = re.compile(r"^[\d\s+()-]+$")
 
 
@@ -24,7 +28,13 @@ def validate_contact(form, user=None):
     email = text(form.get("email"), "El correo", 120, required=True).lower()
     phone = text(form.get("phone"), "El teléfono", 30)
 
-    if not EMAIL_RE.match(email):
+    local_part = email.partition("@")[0]
+    if (
+        not EMAIL_RE.fullmatch(email)
+        or local_part.startswith(".")
+        or local_part.endswith(".")
+        or ".." in local_part
+    ):
         raise ValidationError(f"El correo '{email}' no es válido")
 
     if phone:
