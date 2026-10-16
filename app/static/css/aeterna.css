@@ -28,6 +28,9 @@ body {
   opacity: 1;
   border-bottom: 2px solid var(--ae-white);
 }
+.ae-navbar .navbar-nav .nav-link.active {
+  color: var(--ae-white);
+}
 
 /* Botones */
 .btn-ae {
@@ -212,4 +215,38 @@ a:hover {
   justify-content: center;
   color: #6c757d;
   background-color: #eef2f8;
+}
+
+/* Avatar del usuario en la barra */
+.ae-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  color: #0b3a5e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .85rem;
+}
+
+/* Botones redondeados en la barra y el hero */
+.ae-navbar .btn,
+.ae-hero .btn {
+  border-radius: 50rem;
+}
+
+/* Tarjetas con efecto al pasar el mouse */
+.ae-card {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+a:hover > .ae-card {
+  transform: translateY(-3px);
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08);
+}
+
+/* Formularios de login y registro */
+.ae-auth {
+  max-width: 460px;
 }

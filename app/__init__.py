@@ -1,10 +1,9 @@
 import os
-from datetime import date
-from flask import Flask, render_template, session, redirect, url_for, abort, current_app
+from flask import Flask, render_template, redirect, url_for
 from .config import Config
 from .extensions import db
 from .exceptions import AeternaError
-from .services.access import current_role, ROLES
+from .services.access import current_user, current_role
 
 
 def create_app(config=Config):
@@ -15,41 +14,27 @@ def create_app(config=Config):
     db.init_app(app)
 
     # Blueprints (controladores)
+    from .controllers.auth_controller import bp as auth_bp
     from .controllers.book_controller import bp as books_bp
-    app.register_blueprint(books_bp)
-
     from .controllers.catalog_controller import bp as catalog_bp
-    app.register_blueprint(catalog_bp)
-
     from .controllers.admin_controller import bp as admin_bp
-    app.register_blueprint(admin_bp)
-
-    # Activa estos cuando cada controlador defina su `bp`:
     from .controllers.author_controller import bp as authors_bp
-    # from .controllers.user_controller import bp as users_bp
+    from .controllers.user_controller import bp as users_bp
     # from .controllers.loan_controller import bp as loans_bp
-    app.register_blueprint(authors_bp)
-    # app.register_blueprint(users_bp)
+    for bp in (auth_bp, books_bp, catalog_bp, admin_bp, authors_bp, users_bp):
+        app.register_blueprint(bp)
     # app.register_blueprint(loans_bp)
 
-    # Rol disponible en todas las plantillas
+    # Usuario y rol disponibles en todas las plantillas
     @app.context_processor
     def inject_auth_state():
-        role = current_role()
+        user = current_user()
         return {
-            "role": role,
-            "is_admin": role == "admin",
-            "is_logged_in": role != "guest",
+            "current_user": user,
+            "role": current_role(),
+            "is_admin": bool(user and user.is_admin),
+            "is_logged_in": user is not None,
         }
-
-    # TEMPORAL: cambia el rol sin login (solo en modo debug). Bórralo cuando exista el login.
-    @app.route("/dev/role/<role>")
-    def dev_set_role(role):
-        if not current_app.debug:
-            abort(404)
-        if role in ROLES:
-            session["role"] = role
-        return redirect(url_for("home"))
 
     # Página principal (pública). El administrador va directo a su panel.
     @app.route("/")

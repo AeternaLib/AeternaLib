@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ user.name }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 800px;">
+  <div class="ae-page-header">
+    <div>
+      <h2>{{ user.name }}</h2>
+      <span class="badge {{ 'bg-dark' if user.is_admin else 'bg-secondary-subtle text-secondary-emphasis' }}">
+        {{ user.role_label }}
+      </span>
+    </div>
+    <a href="{{ url_for('users.edit', user_id=user.id) }}" class="btn btn-ae">
+      <i class="bi bi-pencil"></i> Editar
+    </a>
+  </div>
+
+  <div class="ae-form-card">
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <h6 class="text-muted mb-1">Identificación</h6>
+        <p class="mb-0">{{ user.document }}</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="text-muted mb-1">Correo</h6>
+        <p class="mb-0">{{ user.email }}</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="text-muted mb-1">Teléfono</h6>
+        <p class="mb-0">{{ user.phone or '—' }}</p>
+      </div>
+    </div>
+
+    <h5>Historial de préstamos</h5>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr><th>Libro</th><th>Edición</th><th>Préstamo</th><th>Vence</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          {% for l in user.loans | sort(attribute='loan_date', reverse=True) %}
+          <tr>
+            <td>{{ l.edition.book.title }}</td>
+            <td>{{ l.edition.label }}</td>
+            <td>{{ l.loan_date.strftime('%d/%m/%Y') }}</td>
+            <td>{{ l.due_date.strftime('%d/%m/%Y') }}</td>
+            <td>
+              <span class="badge {{ 'bg-danger' if l.status in ('Atrasado', 'Devuelto con retraso') else ('bg-success' if l.return_date else 'bg-primary') }}">
+                {{ l.status }}
+              </span>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted text-center py-3">Este usuario aún no tiene préstamos.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="{{ url_for('users.index') }}" class="d-inline-block mt-3">← Volver a usuarios</a>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar usuario' if user else 'Nuevo usuario' }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+  <div class="ae-page-header">
+    <h2>{{ 'Editar usuario' if user else 'Nuevo usuario' }}</h2>
+  </div>
+
+  <div class="ae-form-card">
+    <form method="post"
+          action="{{ url_for('users.edit', user_id=user.id) if user else url_for('users.create') }}">
+      <div class="mb-3">
+        <label class="form-label">Nombre completo *</label>
+        <input class="form-control" name="name" required maxlength="120"
+               value="{{ user.name if user else '' }}">
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Identificación (documento) *</label>
+          <input class="form-control" name="document" required maxlength="30"
+                 value="{{ user.document if user else '' }}">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Teléfono de contacto</label>
+          <input type="tel" class="form-control" name="phone" maxlength="30" placeholder="300 123 4567"
+                 value="{{ user.phone or '' if user else '' }}">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <label class="form-label">Correo electrónico *</label>
+          <input type="email" class="form-control" name="email" required maxlength="120"
+                 value="{{ user.email if user else '' }}">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Tipo de usuario *</label>
+          <select class="form-select" name="role" required>
+            {% for key, label in roles.items() %}
+            <option value="{{ key }}" {{ 'selected' if (user.role if user else 'client') == key }}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">{{ 'Nueva contraseña' if user else 'Contraseña *' }}</label>
+        <input type="password" class="form-control" name="password" minlength="8"
+               autocomplete="new-password" {{ '' if user else 'required' }}>
+        <div class="form-text">
+          {% if user %}Déjala vacía para conservar la actual.{% else %}Mínimo 8 caracteres.{% endif %}
+        </div>
+      </div>
+
+      <button class="btn btn-ae"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{{ url_for('users.index') if not user else url_for('users.detail', user_id=user.id) }}"
+         class="btn btn-ae-light">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
