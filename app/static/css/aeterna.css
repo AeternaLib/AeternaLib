@@ -348,3 +348,15 @@ a:hover > .ae-card {
     font-size: 1.9rem;
   }
 }
+
+/* Filtros de prestamos */
+.nav-pills .nav-link {
+  color: var(--ae-blue);
+  background: var(--ae-soft);
+  font-weight: 600;
+}
+
+.nav-pills .nav-link.active {
+  background: var(--ae-blue);
+  color: var(--ae-white);
+}

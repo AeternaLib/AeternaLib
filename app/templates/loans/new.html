@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Nuevo préstamo · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+  <div class="ae-page-header">
+    <div>
+      <h2>Nuevo préstamo</h2>
+      <p class="text-muted mb-0">Registra la salida de un ejemplar a nombre de un lector.</p>
+    </div>
+  </div>
+
+  <div class="ae-form-card">
+    <form method="post" action="{{ url_for('loans.new') }}">
+      <div class="mb-3">
+        <label class="form-label" for="edition_id">Libro *</label>
+        <select class="form-select" id="edition_id" name="edition_id" required>
+          <option value="">Selecciona un libro…</option>
+          {% for e in editions %}
+          <option value="{{ e.id }}"
+                  {{ 'disabled' if not e.available_copies }}
+                  {{ 'selected' if form.get('edition_id') == e.id|string and e.available_copies }}>
+            {{ e.book.title }} · {{ e.label }} —
+            {{ e.available_copies ~ ' disponible' ~ ('' if e.available_copies == 1 else 's') if e.available_copies else 'sin ejemplares' }}
+          </option>
+          {% endfor %}
+        </select>
+        <div class="form-text">Los libros sin ejemplares disponibles aparecen deshabilitados.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="user_id">Lector *</label>
+        <select class="form-select" id="user_id" name="user_id" required>
+          <option value="">Selecciona un lector…</option>
+          {% for r in readers %}
+          <option value="{{ r.id }}" {{ 'selected' if form.get('user_id') == r.id|string }}>
+            {{ r.name }} · {{ r.document }}
+          </option>
+          {% endfor %}
+        </select>
+        {% if not readers %}
+        <div class="form-text text-danger">No hay lectores registrados. Crea uno en Usuarios.</div>
+        {% endif %}
+      </div>
+
+      <div class="row align-items-end mb-4">
+        <div class="col-sm-4 mb-3 mb-sm-0">
+          <label class="form-label" for="days">Días de préstamo *</label>
+          <input type="number" class="form-control" id="days" name="days" required
+                 min="1" max="{{ max_days }}" value="{{ form.get('days') or default_days }}">
+        </div>
+        <div class="col-sm-8">
+          <div class="alert alert-info ae-alert mb-0 py-2" role="status">
+            <i class="bi bi-calendar-check"></i>
+            Fecha de devolución prevista:
+            <strong id="due-date-preview">{{ due_date.strftime('%d/%m/%Y') }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-ae"><i class="bi bi-check-lg"></i> Registrar préstamo</button>
+      <a href="{{ url_for('loans.index') }}" class="btn btn-ae-light">Cancelar</a>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var input = document.getElementById("days");
+    var preview = document.getElementById("due-date-preview");
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function update() {
+      var days = parseInt(input.value, 10);
+      if (isNaN(days) || days < 1 || days > {{ max_days }}) {
+        preview.textContent = "—";
+        return;
+      }
+      var due = new Date();
+      due.setDate(due.getDate() + days);
+      preview.textContent = pad(due.getDate()) + "/" + pad(due.getMonth() + 1) + "/" + due.getFullYear();
+    }
+    input.addEventListener("input", update);
+    update();
+  })();
+</script>
+{% endblock %}
