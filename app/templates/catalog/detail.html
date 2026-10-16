@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from "catalog/_macros.html" import price, cover %}
+{% block title %}{{ edition.book.title }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 960px;">
+  <a href="{{ url_for('catalog.index') }}" class="d-inline-block mb-3">← Volver al catálogo</a>
+
+  <div class="row g-4">
+    <div class="col-md-5">
+      <div class="shadow-sm rounded overflow-hidden">{{ cover(edition, '460px') }}</div>
+    </div>
+
+    <div class="col-md-7">
+      <h2 class="mb-1">{{ edition.book.title }}</h2>
+      <p class="text-muted mb-3">
+        {% for a in edition.book.authors %}
+          <a href="{{ url_for('authors.detail', author_id=a.id) }}">{{ a.name }}</a>{{ ', ' if not loop.last }}
+        {% else %}Autor desconocido{% endfor %}
+      </p>
+
+      <div class="mb-3">
+        {% if edition.has_discount %}
+        <span class="badge bg-danger me-2">-{{ edition.discount_percent }}%</span>
+        <span class="text-decoration-line-through text-muted">{{ price(edition.price) }}</span><br>
+        <span class="fw-bold text-danger display-6">{{ price(edition.final_price) }}</span>
+        {% else %}
+        <span class="fw-bold display-6">{{ price(edition.price) }}</span>
+        {% endif %}
+      </div>
+
+      <span class="badge {{ 'bg-success' if edition.available_copies else 'bg-secondary' }} mb-3">
+        {{ edition.available_copies ~ ' disponibles' if edition.available_copies else 'Agotado' }}
+      </span>
+
+      <dl class="row mb-3">
+        <dt class="col-sm-4">Editorial</dt><dd class="col-sm-8">{{ edition.publisher or '—' }}</dd>
+        <dt class="col-sm-4">Año de edición</dt><dd class="col-sm-8">{{ edition.edition_year or '—' }}</dd>
+        <dt class="col-sm-4">Publicación original</dt><dd class="col-sm-8">{{ edition.book.year or '—' }}</dd>
+        <dt class="col-sm-4">Género</dt><dd class="col-sm-8">{{ edition.book.genre or '—' }}</dd>
+        <dt class="col-sm-4">ISBN-13</dt><dd class="col-sm-8">{{ edition.isbn_13 }}</dd>
+      </dl>
+
+      <button class="btn btn-ae btn-lg" {{ 'disabled' if not edition.available_copies }}>
+        <i class="bi bi-bag-plus"></i> Rentar
+      </button>
+    </div>
+  </div>
+
+  {% if others %}
+  <h5 class="mt-5 mb-3">Otras ediciones</h5>
+  <div class="list-group">
+    {% for o in others %}
+    <a href="{{ url_for('catalog.detail', edition_id=o.id) }}"
+       class="list-group-item list-group-item-action d-flex justify-content-between">
+      <span>{{ o.label }}</span>
+      <span class="fw-semibold">{{ price(o.final_price) }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

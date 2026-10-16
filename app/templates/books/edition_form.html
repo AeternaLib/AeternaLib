@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar edición' if edition else 'Nueva edición' }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+  <div class="ae-page-header">
+    <div>
+      <h2>{{ 'Editar edición' if edition else 'Nueva edición' }}</h2>
+      <span class="text-muted">{{ book.title }}</span>
+    </div>
+  </div>
+
+  <div class="ae-form-card">
+    <form method="post">
+      {% include "books/_edition_fields.html" %}
+
+      <button class="btn btn-ae"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{{ url_for('books.detail', book_id=book.id) }}" class="btn btn-ae-light">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
