@@ -3,31 +3,22 @@
 {% block content %}
 <div class="container">
   <div class="ae-page-header">
-    <h2>Préstamos</h2>
-    <a href="{{ url_for('loans.create') }}" class="btn btn-ae">
-      <i class="bi bi-plus-lg"></i> Registrar préstamo
-    </a>
-  </div>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    <div>
+      <h2>Préstamos</h2>
+      <p class="text-muted mb-0">Consulta los préstamos y registra las devoluciones.</p>
     </div>
-    {% endfor %}
-  {% endwith %}
+  </div>
 
   <div class="ae-table-wrap">
     <div class="table-responsive">
-      <table class="table table-striped align-middle">
+      <table class="table table-striped align-middle mb-0">
         <thead>
           <tr>
-            <th>Libro / edición</th>
-            <th>Usuario</th>
+            <th>Libro</th>
+            <th>Edición</th>
+            <th>Lector</th>
             <th>Fecha de préstamo</th>
             <th>Fecha límite</th>
-            <th>Devolución</th>
             <th>Estado</th>
             <th class="text-end">Acción</th>
           </tr>
@@ -35,33 +26,33 @@
         <tbody>
           {% for loan in loans %}
           <tr>
-            <td>{{ loan.book.title }} <span class="text-muted">· {{ loan.edition.label }}</span></td>
-            <td>
-              <a href="{{ url_for('users.detail', user_id=loan.user.id) }}">
-                {{ loan.user.name }}
-              </a>
-            </td>
+            <td>{{ loan.edition.book.title }}</td>
+            <td>{{ loan.edition.label }}</td>
+            <td>{{ loan.user.name }}</td>
             <td>{{ loan.loan_date.strftime('%d/%m/%Y') }}</td>
             <td>{{ loan.due_date.strftime('%d/%m/%Y') }}</td>
-            <td>{{ loan.return_date.strftime('%d/%m/%Y') if loan.return_date else '—' }}</td>
             <td>
-              {{ loan.status }}
-              {% if loan.return_date and loan.days_late %}
-              <span class="text-muted">({{ loan.days_late }} días de retraso)</span>
-              {% endif %}
+              <span class="badge {{ 'bg-danger' if loan.status == 'Atrasado' else ('bg-success' if loan.return_date else 'bg-primary') }}">
+                {{ loan.status }}
+              </span>
             </td>
             <td class="text-end text-nowrap">
               {% if not loan.return_date %}
-              <form method="post" action="{{ url_for('loans.return_book', loan_id=loan.id) }}">
-                <button class="btn btn-sm btn-ae">Devolver</button>
+              <form method="post" action="{{ url_for('loans.return_loan', loan_id=loan.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-ae">
+                  <i class="bi bi-arrow-return-left"></i> Registrar devolución
+                </button>
               </form>
+              {% else %}
+              <span class="text-muted">Devuelto {{ loan.return_date.strftime('%d/%m/%Y') }}</span>
               {% endif %}
             </td>
           </tr>
           {% else %}
           <tr>
             <td colspan="7" class="text-center text-muted py-5">
-              No hay préstamos registrados todavía
+              <i class="bi bi-arrow-left-right fs-3 d-block mb-2"></i>
+              Aún no hay préstamos registrados.
             </td>
           </tr>
           {% endfor %}

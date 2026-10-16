@@ -34,8 +34,12 @@
                 <i class="bi bi-pencil"></i> Editar
               </a>
               <form method="post" action="{{ url_for('authors.delete', author_id=a.id) }}"
-                class="d-inline js-confirm-delete" data-name="{{ a.name }}">
-                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                class="d-inline js-confirm-action"
+                data-confirm-title="¿Eliminar autor?"
+                data-confirm-message="Vas a eliminar a {{ a.name }}. Sus libros seguirán en el catálogo.">
+                <button class="btn btn-sm btn-outline-danger" aria-label="Eliminar autor {{ a.name }}">
+                  <i class="bi bi-trash"></i>
+                </button>
               </form>
             </td>
           </tr>
@@ -52,41 +56,5 @@
     </div>
   </div>
 </div>
-
-<div class="modal fade" id="confirmDelete" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content ae-modal">
-      <div class="modal-body text-center p-4">
-        <div class="ae-modal-icon"><i class="bi bi-exclamation-triangle"></i></div>
-        <h5 class="mb-2">¿Eliminar autor?</h5>
-        <p class="text-muted mb-4" id="confirmDeleteText"></p>
-        <button type="button" class="btn btn-ae-light" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Sí, eliminar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var modal = new bootstrap.Modal(document.getElementById('confirmDelete'));
-    var text = document.getElementById('confirmDeleteText');
-    var pending = null;
-
-    document.querySelectorAll('.js-confirm-delete').forEach(function (form) {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        pending = form;
-        text.textContent = 'Vas a eliminar a "' + form.dataset.name +
-          '". Esta acción no se puede deshacer. Sus libros seguirán en el catálogo.';
-        modal.show();
-      });
-    });
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-      if (pending) pending.submit();
-    });
-  });
-</script>
 
 {% endblock %}

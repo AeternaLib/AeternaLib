@@ -6,8 +6,13 @@
 <section class="ae-hero text-center">
   <div class="container">
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="AeternaLib" class="mb-3">
+    {% if current_user %}
+    <h1 class="display-5">Hola, {{ current_user.first_name }}</h1>
+    <p class="lead mb-4">¿Qué libro quieres leer hoy?</p>
+    {% else %}
     <h1 class="display-5">Tu biblioteca digital</h1>
     <p class="lead mb-4">Busca, renta y disfruta libros de forma rápida y sencilla.</p>
+    {% endif %}
 
     <form action="{{ url_for('catalog.index') }}" method="get" class="ae-search mx-auto">
       <div class="input-group input-group-lg">
@@ -17,19 +22,19 @@
     </form>
 
     <div class="mt-4 d-flex flex-wrap justify-content-center gap-2">
-      <a href="{{ url_for('catalog.index') }}" class="btn btn-light btn-lg">
-        <i class="bi bi-journal-bookmark"></i> Ver catálogo
+      <a href="{{ url_for('catalog.index') }}" class="btn btn-light btn-lg px-4 fw-semibold">
+        <i class="bi bi-journal-bookmark me-1"></i> Ver catálogo
       </a>
       {% if not is_logged_in %}
-      <a href="/register" class="btn btn-ae-outline btn-lg">
-        <i class="bi bi-person-plus"></i> Crear cuenta
+      <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg px-4">
+        <i class="bi bi-person-plus me-1"></i> Crear cuenta
       </a>
-      <a href="/login" class="btn btn-ae-outline btn-lg">
-        <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
       </a>
       {% else %}
-      <a href="/account/loans" class="btn btn-ae-outline btn-lg">
-        <i class="bi bi-arrow-left-right"></i> Mis préstamos
+      <a href="{{ url_for('auth.account', _anchor='loans') }}" class="btn btn-outline-light btn-lg px-4">
+        <i class="bi bi-arrow-left-right me-1"></i> Mis préstamos
       </a>
       {% endif %}
     </div>
@@ -59,7 +64,7 @@
       </a>
     </div>
     <div class="col-6 col-lg-3">
-      <a href="/account/loans" class="text-decoration-none">
+      <a href="{{ url_for('auth.account', _anchor='loans') }}" class="text-decoration-none">
         <div class="ae-card p-4 text-center h-100">
           <div class="icon"><i class="bi bi-arrow-left-right"></i></div>
           <h5 class="mt-2">Mis préstamos</h5>
@@ -68,7 +73,7 @@
       </a>
     </div>
     <div class="col-6 col-lg-3">
-      <a href="/account" class="text-decoration-none">
+      <a href="{{ url_for('auth.account') }}" class="text-decoration-none">
         <div class="ae-card p-4 text-center h-100">
           <div class="icon"><i class="bi bi-person-circle"></i></div>
           <h5 class="mt-2">Mi cuenta</h5>
@@ -86,8 +91,8 @@
     {% for g, icon in [('Novela', 'bi-book'), ('Cuento', 'bi-chat-quote'), ('Poesía', 'bi-feather'),
                        ('Ensayo', 'bi-pencil-square'), ('Historia', 'bi-hourglass-split'),
                        ('Infantil', 'bi-emoji-smile')] %}
-    <a href="{{ url_for('catalog.index', genre=g) }}" class="btn btn-ae-light btn-lg">
-      <i class="bi {{ icon }}"></i> {{ g }}
+    <a href="{{ url_for('catalog.index', genre=g) }}" class="btn btn-ae-light btn-lg px-4">
+      <i class="bi {{ icon }} me-1"></i> {{ g }}
     </a>
     {% endfor %}
   </div>
@@ -123,18 +128,25 @@
   <div class="ae-card p-5 text-center">
     <h3 class="mb-2">¿Aún no tienes cuenta?</h3>
     <p class="text-muted mb-4">Regístrate gratis para rentar libros y seguir tus préstamos.</p>
-    <a href="/register" class="btn btn-ae btn-lg me-2"><i class="bi bi-person-plus"></i> Crear cuenta</a>
-    <a href="/login" class="btn btn-ae-light btn-lg">Ya tengo cuenta</a>
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-ae btn-lg px-4">
+        <i class="bi bi-person-plus me-1"></i> Crear cuenta
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ae-light btn-lg px-4">Ya tengo cuenta</a>
+    </div>
   </div>
 </section>
 {% endif %}
 
 <!-- AYUDA -->
-<section class="container mb-5">
+<section class="container mb-5 mt-5">
   <div class="row g-3 text-center">
-    <div class="col-md-4"><a href="/help" class="text-decoration-none"><i class="bi bi-question-circle"></i> Preguntas frecuentes</a></div>
-    <div class="col-md-4"><a href="/terms" class="text-decoration-none"><i class="bi bi-file-text"></i> Términos y condiciones</a></div>
-    <div class="col-md-4"><a href="/contact" class="text-decoration-none"><i class="bi bi-envelope"></i> Contacto</a></div>
+    <div class="col-md-4"><a href="/help" class="text-decoration-none"><i class="bi bi-question-circle"></i> Preguntas
+        frecuentes</a></div>
+    <div class="col-md-4"><a href="/terms" class="text-decoration-none"><i class="bi bi-file-text"></i> Términos y
+        condiciones</a></div>
+    <div class="col-md-4"><a href="/contact" class="text-decoration-none"><i class="bi bi-envelope"></i>
+        Contacto</a></div>
   </div>
 </section>
 
