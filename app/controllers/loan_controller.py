@@ -1,6 +1,5 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from app.models.loan import Loan
 from app.services.access import admin_only, current_user, login_required
 from app.services.loan_service import LoanService
 
@@ -15,7 +14,7 @@ def protect_admin_routes():
 
 @bp.route("/")
 def index():
-    loans = Loan.query.order_by(Loan.loan_date.desc(), Loan.id.desc()).all()
+    loans = LoanService.history()
     return render_template("loans/index.html", loans=loans)
 
 

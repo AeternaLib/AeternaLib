@@ -49,4 +49,4 @@ class LoanService:
             q = q.filter(Loan.loan_date >= start)
         if end:
             q = q.filter(Loan.loan_date <= end)
-        return q.order_by(Loan.loan_date.desc()).all()
+        return q.order_by(Loan.loan_date.desc(), Loan.id.desc()).all()
