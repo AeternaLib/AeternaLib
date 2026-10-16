@@ -2,22 +2,26 @@ from datetime import date, timedelta
 from flask import current_app
 from app.extensions import db
 from app.exceptions import BookNotAvailableError, LoanNotFoundError, LoanAlreadyReturnedError, ValidationError
-from app.models.book import Book
+from app.models.book import Edition
 from app.models.user import User
 from app.models.loan import Loan
 
+
 class LoanService:
     @staticmethod
-    def borrow(book_id, user_id, days=None):
-        if not book_id or not user_id:
-            raise ValidationError("Libro y usuario son obligatorios")
-        book = Book.get_or_fail(book_id)
+    def borrow(edition_id, user_id, days=None):
+        if not edition_id or not user_id:
+            raise ValidationError("Edición y usuario son obligatorios")
+        edition = Edition.get_or_fail(edition_id)
         user = User.get_or_fail(user_id)
-        if not book.is_available:
-            raise BookNotAvailableError(f"'{book.title}' no tiene ejemplares disponibles")
-        days = days or current_app.config["LOAN_DAYS"]
-        loan = Loan(book=book, user=user, due_date=date.today() + timedelta(days=days))
-        book.available_copies -= 1
+        if edition.available_copies < 1:
+            raise BookNotAvailableError(f"'{edition.book.title}' no tiene ejemplares disponibles en esta edición")
+        if days is None:
+            days = current_app.config["LOAN_DAYS"]
+        if days < 1:
+            raise ValidationError("La duración del préstamo debe ser de al menos un día")
+        loan = Loan(edition=edition, user=user, due_date=date.today() + timedelta(days=days))
+        edition.available_copies -= 1
         db.session.add(loan)
         db.session.commit()
         return loan
@@ -30,15 +34,19 @@ class LoanService:
         if loan.return_date:
             raise LoanAlreadyReturnedError("Este préstamo ya fue devuelto")
         loan.return_date = date.today()
-        loan.book.available_copies += 1
+        loan.edition.available_copies += 1
         db.session.commit()
-        return loan  # loan.days_late te da los días de retraso
+        return loan
 
     @staticmethod
     def history(user_id=None, book_id=None, start=None, end=None):
         q = Loan.query
-        if user_id: q = q.filter_by(user_id=user_id)
-        if book_id: q = q.filter_by(book_id=book_id)
-        if start:   q = q.filter(Loan.loan_date >= start)
-        if end:     q = q.filter(Loan.loan_date <= end)
+        if user_id:
+            q = q.filter_by(user_id=user_id)
+        if book_id:
+            q = q.join(Loan.edition).filter(Edition.book_id == book_id)
+        if start:
+            q = q.filter(Loan.loan_date >= start)
+        if end:
+            q = q.filter(Loan.loan_date <= end)
         return q.order_by(Loan.loan_date.desc()).all()

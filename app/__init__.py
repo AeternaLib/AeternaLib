@@ -20,10 +20,9 @@ def create_app(config=Config):
     from .controllers.admin_controller import bp as admin_bp
     from .controllers.author_controller import bp as authors_bp
     from .controllers.user_controller import bp as users_bp
-    # from .controllers.loan_controller import bp as loans_bp
-    for bp in (auth_bp, books_bp, catalog_bp, admin_bp, authors_bp, users_bp):
+    from .controllers.loan_controller import bp as loans_bp
+    for bp in (auth_bp, books_bp, catalog_bp, admin_bp, authors_bp, users_bp, loans_bp):
         app.register_blueprint(bp)
-    # app.register_blueprint(loans_bp)
 
     # Usuario y rol disponibles en todas las plantillas
     @app.context_processor

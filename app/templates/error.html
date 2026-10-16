@@ -5,7 +5,7 @@
   <div class="ae-form-card text-center p-5">
     <div class="ae-modal-icon"><i class="bi bi-exclamation-triangle"></i></div>
     <h4 class="mb-2">No se pudo completar la acción</h4>
-    <p class="text-muted mb-4">{{ message }}</p>
+    <div class="alert alert-danger ae-alert text-start mb-4" role="alert">{{ message }}</div>
     <a href="javascript:history.back()" class="btn btn-ae-light">Volver</a>
     <a href="{{ url_for('home') }}" class="btn btn-ae">Ir al inicio</a>
   </div>
