@@ -98,7 +98,7 @@ En desarrollo. Actualmente cuenta con la arquitectura base, el modelo de datos, 
 ## Autores
 
 - Nahia Sánchez
-- Camila Viveros
+- María Camila Viveros
 - Kevin Palma
 - Samuel Ospitia
 
