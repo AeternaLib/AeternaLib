@@ -1,8 +1,17 @@
 from app.extensions import db
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from app.exceptions import ValidationError
+from app.services.text import normalize
 from .base import BaseModel
 from .author import Author
+
+
+def _text_filter(query, q, fields):
+    """Cada palabra debe aparecer en algún campo (AND entre palabras, OR entre campos)."""
+    for term in normalize(q).split():
+        like = f"%{term}%"
+        query = query.filter(or_(*[func.norm(f).like(like) for f in fields]))
+    return query
 
 
 class Book(BaseModel):  # = la OBRA
@@ -36,17 +45,26 @@ class Book(BaseModel):  # = la OBRA
         return ", ".join(a.name for a in self.authors) or "Autor desconocido"
 
     @classmethod
+    def genres(cls):
+        """Géneros existentes, sin repetir y ordenados, para la lista desplegable."""
+        rows = (
+            db.session.query(cls.genre)
+            .filter(cls.genre.isnot(None), cls.genre != "")
+            .distinct()
+            .order_by(cls.genre)
+            .all()
+        )
+        return [r[0] for r in rows]
+
+    @classmethod
     def search(cls, q="", genre=None):
         query = cls.query.outerjoin(Edition).outerjoin(cls.authors)
-        if q:
-            like = f"%{q.strip()}%"
-            digits = f"%{q.replace('-', '').strip()}%"
-            query = query.filter(or_(
-                cls.title.ilike(like), Author.name.ilike(like),
-                Edition.publisher.ilike(like), Edition.isbn_13.like(digits),
-            ))
+        query = _text_filter(query, q, [
+            cls.title, Author.name, Edition.publisher,
+            func.replace(Edition.isbn_13, "-", ""),
+        ])
         if genre:
-            query = query.filter(cls.genre.ilike(f"%{genre.strip()}%"))
+            query = query.filter(func.norm(cls.genre) == normalize(genre))
         return query.distinct().order_by(cls.title).all()
 
 
@@ -84,17 +102,17 @@ class Edition(BaseModel):
 
     @classmethod
     def catalog_search(cls, q="", genre=None, only_offers=False):
-        """Búsqueda para el catálogo público: devuelve ediciones."""
+        """Búsqueda para el catálogo público: devuelve ediciones.
+
+        Texto y género se combinan: deben cumplirse los dos.
+        """
         query = cls.query.join(Book).outerjoin(Book.authors)
-        if q:
-            like = f"%{q.strip()}%"
-            digits = f"%{q.replace('-', '').strip()}%"
-            query = query.filter(or_(
-                Book.title.ilike(like), Author.name.ilike(like),
-                cls.publisher.ilike(like), cls.isbn_13.like(digits),
-            ))
+        query = _text_filter(query, q, [
+            Book.title, Author.name, cls.publisher,
+            func.replace(cls.isbn_13, "-", ""),
+        ])
         if genre:
-            query = query.filter(Book.genre.ilike(f"%{genre.strip()}%"))
+            query = query.filter(func.norm(Book.genre) == normalize(genre))
         if only_offers:
             query = query.filter(cls.discount_percent > 0)
         return query.distinct().order_by(Book.title).all()

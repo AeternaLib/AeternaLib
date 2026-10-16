@@ -7,19 +7,23 @@
     <h2>Catálogo</h2>
   </div>
 
-  <form class="row g-2 mb-4" method="get">
+  <form class="row g-2 mb-3" method="get" action="{{ url_for('catalog.index') }}">
     <div class="col-md-5">
-      <input class="form-control" name="q" placeholder="Título, autor, editorial o ISBN"
-             value="{{ request.args.get('q', '') }}">
+      <input class="form-control" name="q" placeholder="Buscar por título, autor, editorial o ISBN"
+             value="{{ q }}" aria-label="Buscar">
     </div>
     <div class="col-md-3">
-      <input class="form-control" name="genre" placeholder="Género"
-             value="{{ request.args.get('genre', '') }}">
+      <select class="form-select" name="genre" aria-label="Género">
+        <option value="">Todos los géneros</option>
+        {% for g in genres %}
+        <option value="{{ g }}" {{ 'selected' if g == genre }}>{{ g }}</option>
+        {% endfor %}
+      </select>
     </div>
     <div class="col-md-2 d-flex align-items-center">
       <div class="form-check">
         <input class="form-check-input" type="checkbox" name="offers" id="offers" value="1"
-               {{ 'checked' if request.args.get('offers') }}>
+               {{ 'checked' if offers }}>
         <label class="form-check-label" for="offers">Solo ofertas</label>
       </div>
     </div>
@@ -28,13 +32,25 @@
     </div>
   </form>
 
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+    <span class="text-muted">
+      {{ editions | length }} resultado{{ '' if editions | length == 1 else 's' }}
+    </span>
+    {% if q %}<span class="badge bg-secondary-subtle text-secondary-emphasis">Texto: {{ q }}</span>{% endif %}
+    {% if genre %}<span class="badge bg-secondary-subtle text-secondary-emphasis">Género: {{ genre }}</span>{% endif %}
+    {% if offers %}<span class="badge bg-secondary-subtle text-secondary-emphasis">Solo ofertas</span>{% endif %}
+    {% if q or genre or offers %}
+    <a href="{{ url_for('catalog.index') }}" class="small ms-1"><i class="bi bi-x-circle"></i> Limpiar filtros</a>
+    {% endif %}
+  </div>
+
   <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
     {% for e in editions %}
     <div class="col">
       <a href="{{ url_for('catalog.detail', edition_id=e.id) }}" class="text-decoration-none text-reset">
         <div class="card h-100 border-0 shadow-sm position-relative">
           {% if e.has_discount %}
-          <span class="badge bg-danger position-absolute top-0 start-0 m-2">-{{ e.discount_percent }}%</span>
+          <span class="badge bg-danger position-absolute top-0 start-0 m-2" style="z-index:1;">-{{ e.discount_percent }}%</span>
           {% endif %}
           {{ cover(e) }}
           <div class="card-body">
@@ -60,8 +76,23 @@
     </div>
     {% else %}
     <div class="col-12 text-center text-muted py-5">
-      <i class="bi bi-search fs-3 d-block mb-2"></i>
-      No encontramos libros con esa búsqueda
+      <i class="bi bi-search fs-1 d-block mb-3"></i>
+      <h5 class="mb-2">No encontramos libros con esa búsqueda</h5>
+      <p class="mb-3">
+        {% if q and genre %}
+          No hay resultados para «{{ q }}» en el género {{ genre }}.
+        {% elif q %}
+          No hay resultados para «{{ q }}».
+        {% elif genre %}
+          Todavía no hay libros del género {{ genre }}.
+        {% else %}
+          Todavía no hay libros en el catálogo.
+        {% endif %}
+        Revisa la ortografía o prueba con menos palabras.
+      </p>
+      {% if q or genre or offers %}
+      <a href="{{ url_for('catalog.index') }}" class="btn btn-ae-light">Ver todo el catálogo</a>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

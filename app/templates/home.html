@@ -1,84 +1,140 @@
 {% extends "base.html" %}
+{% block title %}AeternaLib · Tu biblioteca digital{% endblock %}
 {% block content %}
 
-<!-- Hero con buscador -->
+<!-- HERO -->
 <section class="ae-hero text-center">
   <div class="container">
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="AeternaLib" class="mb-3">
     <h1 class="display-5">Tu biblioteca digital</h1>
-    <p class="lead mb-4">Busca, presta y gestiona libros de forma rápida y sencilla.</p>
+    <p class="lead mb-4">Busca, renta y disfruta libros de forma rápida y sencilla.</p>
 
-    <form action="{{ url_for('books.index') }}" method="get" class="ae-search mx-auto">
+    <form action="{{ url_for('catalog.index') }}" method="get" class="ae-search mx-auto">
       <div class="input-group input-group-lg">
-        <input type="text" name="q" class="form-control" placeholder="Buscar por título o autor...">
-        <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+        <input type="text" name="q" class="form-control" placeholder="Buscar por título, autor, editorial o ISBN...">
+        <button class="btn btn-light" type="submit" aria-label="Buscar"><i class="bi bi-search"></i></button>
       </div>
     </form>
 
-    <div class="mt-4">
-      <a href="{{ url_for('books.index') }}" class="btn btn-ae-outline btn-lg">Ver catálogo</a>
+    <div class="mt-4 d-flex flex-wrap justify-content-center gap-2">
+      <a href="{{ url_for('catalog.index') }}" class="btn btn-light btn-lg">
+        <i class="bi bi-journal-bookmark"></i> Ver catálogo
+      </a>
+      {% if not is_logged_in %}
+      <a href="/register" class="btn btn-ae-outline btn-lg">
+        <i class="bi bi-person-plus"></i> Crear cuenta
+      </a>
+      <a href="/login" class="btn btn-ae-outline btn-lg">
+        <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+      </a>
+      {% else %}
+      <a href="/account/loans" class="btn btn-ae-outline btn-lg">
+        <i class="bi bi-arrow-left-right"></i> Mis préstamos
+      </a>
+      {% endif %}
     </div>
   </div>
 </section>
 
-<!-- Estadísticas -->
-<section class="ae-stats py-4">
-  <div class="container">
-    <div class="row text-center g-3">
-      <div class="col-6 col-md-3">
-        <div class="ae-stat-number">{{ stats.books }}</div>
-        <div>Libros</div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="ae-stat-number">{{ stats.users }}</div>
-        <div>Lectores</div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="ae-stat-number">{{ stats.active_loans }}</div>
-        <div>Préstamos activos</div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="ae-stat-number">{{ stats.overdue }}</div>
-        <div>Atrasados</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Accesos rápidos -->
+<!-- ACCESOS RÁPIDOS -->
 <section class="container mt-5">
   <h3 class="mb-4 text-center">¿Qué quieres hacer?</h3>
-  <div class="row g-4">
-    <div class="col-md-6 col-lg-3">
-      <a href="{{ url_for('books.index') }}" class="text-decoration-none">
-        <div class="ae-card p-4 text-center">
+  <div class="row g-4 justify-content-center">
+    <div class="col-6 col-lg-3">
+      <a href="{{ url_for('catalog.index') }}" class="text-decoration-none">
+        <div class="ae-card p-4 text-center h-100">
           <div class="icon"><i class="bi bi-journal-bookmark"></i></div>
-          <h5 class="mt-2">Libros</h5>
-          <p class="text-muted mb-0">Consulta y administra el catálogo.</p>
+          <h5 class="mt-2">Catálogo</h5>
+          <p class="text-muted mb-0">Explora todos los libros disponibles.</p>
         </div>
       </a>
     </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="ae-card p-4 text-center">
-        <div class="icon"><i class="bi bi-person-lines-fill"></i></div>
-        <h5 class="mt-2">Autores</h5>
-        <p class="text-muted mb-0">Datos biográficos y bibliográficos.</p>
+    <div class="col-6 col-lg-3">
+      <a href="{{ url_for('catalog.index', offers=1) }}" class="text-decoration-none">
+        <div class="ae-card p-4 text-center h-100">
+          <div class="icon"><i class="bi bi-tag"></i></div>
+          <h5 class="mt-2">Ofertas</h5>
+          <p class="text-muted mb-0">Ediciones con descuento.</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="/account/loans" class="text-decoration-none">
+        <div class="ae-card p-4 text-center h-100">
+          <div class="icon"><i class="bi bi-arrow-left-right"></i></div>
+          <h5 class="mt-2">Mis préstamos</h5>
+          <p class="text-muted mb-0">Fechas de entrega y devoluciones.</p>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="/account" class="text-decoration-none">
+        <div class="ae-card p-4 text-center h-100">
+          <div class="icon"><i class="bi bi-person-circle"></i></div>
+          <h5 class="mt-2">Mi cuenta</h5>
+          <p class="text-muted mb-0">Tus datos y preferencias.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- EXPLORAR POR GÉNERO -->
+<section class="container mt-5">
+  <h3 class="mb-4 text-center">Explora por género</h3>
+  <div class="d-flex flex-wrap justify-content-center gap-2">
+    {% for g, icon in [('Novela', 'bi-book'), ('Cuento', 'bi-chat-quote'), ('Poesía', 'bi-feather'),
+                       ('Ensayo', 'bi-pencil-square'), ('Historia', 'bi-hourglass-split'),
+                       ('Infantil', 'bi-emoji-smile')] %}
+    <a href="{{ url_for('catalog.index', genre=g) }}" class="btn btn-ae-light btn-lg">
+      <i class="bi {{ icon }}"></i> {{ g }}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="ae-stats py-5 mt-5">
+  <div class="container">
+    <h3 class="mb-4 text-center">¿Cómo funciona?</h3>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="icon fs-1"><i class="bi bi-search"></i></div>
+        <h5 class="mt-2">1. Busca</h5>
+        <p class="mb-0">Encuentra tu libro por título, autor, editorial o ISBN, y elige la edición que prefieras.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="icon fs-1"><i class="bi bi-bag-check"></i></div>
+        <h5 class="mt-2">2. Renta</h5>
+        <p class="mb-0">Crea tu cuenta, reserva un ejemplar y conoce la fecha límite de devolución.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="icon fs-1"><i class="bi bi-arrow-repeat"></i></div>
+        <h5 class="mt-2">3. Disfruta y devuelve</h5>
+        <p class="mb-0">Lee a tu ritmo y devuelve el libro a tiempo para que otro lector pueda disfrutarlo.</p>
       </div>
     </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="ae-card p-4 text-center">
-        <div class="icon"><i class="bi bi-people"></i></div>
-        <h5 class="mt-2">Usuarios</h5>
-        <p class="text-muted mb-0">Registro de lectores.</p>
-      </div>
-    </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="ae-card p-4 text-center">
-        <div class="icon"><i class="bi bi-arrow-left-right"></i></div>
-        <h5 class="mt-2">Préstamos</h5>
-        <p class="text-muted mb-0">Salidas, devoluciones e historial.</p>
-      </div>
-    </div>
+  </div>
+</section>
+
+<!-- LLAMADO A LA ACCIÓN -->
+{% if not is_logged_in %}
+<section class="container my-5">
+  <div class="ae-card p-5 text-center">
+    <h3 class="mb-2">¿Aún no tienes cuenta?</h3>
+    <p class="text-muted mb-4">Regístrate gratis para rentar libros y seguir tus préstamos.</p>
+    <a href="/register" class="btn btn-ae btn-lg me-2"><i class="bi bi-person-plus"></i> Crear cuenta</a>
+    <a href="/login" class="btn btn-ae-light btn-lg">Ya tengo cuenta</a>
+  </div>
+</section>
+{% endif %}
+
+<!-- AYUDA -->
+<section class="container mb-5">
+  <div class="row g-3 text-center">
+    <div class="col-md-4"><a href="/help" class="text-decoration-none"><i class="bi bi-question-circle"></i> Preguntas frecuentes</a></div>
+    <div class="col-md-4"><a href="/terms" class="text-decoration-none"><i class="bi bi-file-text"></i> Términos y condiciones</a></div>
+    <div class="col-md-4"><a href="/contact" class="text-decoration-none"><i class="bi bi-envelope"></i> Contacto</a></div>
   </div>
 </section>
 

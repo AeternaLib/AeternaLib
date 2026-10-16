@@ -1,17 +1,25 @@
 from flask import Blueprint, render_template, request
-from app.models.book import Edition
+from app.models.book import Book, Edition
 
 bp = Blueprint("catalog", __name__, url_prefix="/catalog")
 
 
 @bp.route("/")
 def index():
-    editions = Edition.catalog_search(
-        request.args.get("q", ""),
-        request.args.get("genre"),
-        only_offers=bool(request.args.get("offers")),
+    q = request.args.get("q", "").strip()
+    genre = request.args.get("genre", "").strip()
+    offers = bool(request.args.get("offers"))
+
+    editions = Edition.catalog_search(q, genre, only_offers=offers)
+
+    genres = Book.genres()
+    if genre and genre not in genres:  # por si llega un género escrito en la URL
+        genres = sorted(genres + [genre])
+
+    return render_template(
+        "catalog/index.html",
+        editions=editions, genres=genres, q=q, genre=genre, offers=offers,
     )
-    return render_template("catalog/index.html", editions=editions)
 
 
 @bp.route("/<int:edition_id>")
