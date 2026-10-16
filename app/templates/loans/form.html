@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Registrar préstamo · AeternaLib{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+  <div class="ae-page-header">
+    <h2>Registrar préstamo</h2>
+  </div>
+
+  <div class="ae-form-card">
+    <form method="post" action="{{ url_for('loans.create') }}">
+      <div class="mb-3">
+        <label class="form-label" for="edition_id">Edición *</label>
+        <select class="form-select" id="edition_id" name="edition_id" required>
+          <option value="">Selecciona una edición</option>
+          {% for edition in editions %}
+          <option value="{{ edition.id }}">
+            {{ edition.book.title }} · {{ edition.label }} ({{ edition.available_copies }} disponibles)
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="user_id">Usuario *</label>
+        <select class="form-select" id="user_id" name="user_id" required>
+          <option value="">Selecciona un usuario</option>
+          {% for user in users %}
+          <option value="{{ user.id }}">{{ user.name }} · {{ user.document }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="btn btn-ae"><i class="bi bi-check-lg"></i> Registrar préstamo</button>
+      <a href="{{ url_for('loans.index') }}" class="btn btn-ae-light">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

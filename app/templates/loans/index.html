@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Préstamos · AeternaLib{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="ae-page-header">
+    <h2>Préstamos</h2>
+    <a href="{{ url_for('loans.create') }}" class="btn btn-ae">
+      <i class="bi bi-plus-lg"></i> Registrar préstamo
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="ae-table-wrap">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Libro / edición</th>
+            <th>Usuario</th>
+            <th>Fecha de préstamo</th>
+            <th>Fecha límite</th>
+            <th>Devolución</th>
+            <th>Estado</th>
+            <th class="text-end">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in loans %}
+          <tr>
+            <td>{{ loan.book.title }} <span class="text-muted">· {{ loan.edition.label }}</span></td>
+            <td>
+              <a href="{{ url_for('users.detail', user_id=loan.user.id) }}">
+                {{ loan.user.name }}
+              </a>
+            </td>
+            <td>{{ loan.loan_date.strftime('%d/%m/%Y') }}</td>
+            <td>{{ loan.due_date.strftime('%d/%m/%Y') }}</td>
+            <td>{{ loan.return_date.strftime('%d/%m/%Y') if loan.return_date else '—' }}</td>
+            <td>
+              {{ loan.status }}
+              {% if loan.return_date and loan.days_late %}
+              <span class="text-muted">({{ loan.days_late }} días de retraso)</span>
+              {% endif %}
+            </td>
+            <td class="text-end text-nowrap">
+              {% if not loan.return_date %}
+              <form method="post" action="{{ url_for('loans.return_book', loan_id=loan.id) }}">
+                <button class="btn btn-sm btn-ae">Devolver</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-5">
+              No hay préstamos registrados todavía
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

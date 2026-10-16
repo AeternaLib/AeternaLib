@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Ficha de {{ user.name }} · AeternaLib{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="ae-page-header">
+    <h2>Ficha del lector</h2>
+    <a class="btn btn-ae-light" href="{{ url_for('users.index') }}">Volver a usuarios</a>
+  </div>
+
+  <section class="ae-form-card mb-4">
+    <h3 class="h5">{{ user.name }}</h3>
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Documento</dt>
+      <dd class="col-sm-9">{{ user.document }}</dd>
+      <dt class="col-sm-3">Correo</dt>
+      <dd class="col-sm-9">{{ user.email }}</dd>
+      <dt class="col-sm-3">Teléfono</dt>
+      <dd class="col-sm-9">{{ user.phone or '—' }}</dd>
+    </dl>
+  </section>
+
+  <h3 class="h4 mb-3">Préstamos activos</h3>
+  {% if active_loans %}
+  <div class="ae-table-wrap">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Libro</th>
+            <th>Devolución prevista</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in active_loans %}
+          <tr>
+            <td>{{ loan.book.title }}</td>
+            <td>{{ loan.due_date.strftime('%d/%m/%Y') }}</td>
+            <td>
+              {% if loan.days_late %}
+              <span class="badge text-bg-danger">Atrasado · {{ loan.days_late }} días</span>
+              {% else %}
+              <span class="badge text-bg-success">Activo</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">Este lector no tiene préstamos activos.</p>
+  {% endif %}
+</div>
+{% endblock %}

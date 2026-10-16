@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Usuarios · AeternaLib{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="ae-page-header">
+    <h2>Usuarios</h2>
+  </div>
+
+  <div class="ae-table-wrap">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Documento</th>
+            <th>Correo</th>
+            <th class="text-center">Préstamos activos</th>
+            <th class="text-end">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.document }}</td>
+            <td>{{ user.email }}</td>
+            <td class="text-center">{{ user.active_loans|length }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-ae-light" href="{{ url_for('users.detail', user_id=user.id) }}">
+                Ver ficha
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-5">
+              No hay usuarios registrados todavía
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

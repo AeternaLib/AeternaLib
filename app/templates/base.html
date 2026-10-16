@@ -27,8 +27,8 @@
                 class="bi bi-speedometer2"></i> Panel</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('books.index') }}">Libros</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('authors.index') }}">Autores</a></li>
-          <li class="nav-item"><a class="nav-link" href="/admin/users">Usuarios</a></li>
-          <li class="nav-item"><a class="nav-link" href="/admin/loans">Préstamos</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('users.index') }}">Usuarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('loans.index') }}">Préstamos</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('catalog.index') }}" title="Ver como lector"><i
                 class="bi bi-eye"></i> Ver catálogo</a></li>
           {% else %}

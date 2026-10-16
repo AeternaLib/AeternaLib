@@ -26,11 +26,11 @@ def create_app(config=Config):
 
     # Activa estos cuando cada controlador defina su `bp`:
     from .controllers.author_controller import bp as authors_bp
-    # from .controllers.user_controller import bp as users_bp
-    # from .controllers.loan_controller import bp as loans_bp
+    from .controllers.loan_controller import bp as loans_bp
+    from .controllers.user_controller import bp as users_bp
     app.register_blueprint(authors_bp)
-    # app.register_blueprint(users_bp)
-    # app.register_blueprint(loans_bp)
+    app.register_blueprint(loans_bp)
+    app.register_blueprint(users_bp)
 
     # Rol disponible en todas las plantillas
     @app.context_processor
