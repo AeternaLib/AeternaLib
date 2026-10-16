@@ -78,4 +78,12 @@ def logout():
 @bp.route("/account")
 @login_required
 def account():
-    return render_template("auth/account.html", user=current_user())
+    user = current_user()
+    active_loans = user.active_loans
+    loans = sorted(user.loans, key=lambda loan: loan.loan_date, reverse=True)
+    return render_template(
+        "auth/account.html",
+        user=user,
+        active_loans=active_loans,
+        loans=loans,
+    )

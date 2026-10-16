@@ -10,3 +10,4 @@ class NotFoundError(AeternaError): status_code = 404
 class BookNotAvailableError(AeternaError): status_code = 409
 class LoanNotFoundError(NotFoundError): pass
 class LoanAlreadyReturnedError(AeternaError): status_code = 409
+class LoanAccessDeniedError(AeternaError): status_code = 403

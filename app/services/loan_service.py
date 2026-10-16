@@ -1,19 +1,20 @@
 from datetime import date, timedelta
 from flask import current_app
 from app.extensions import db
-from app.exceptions import BookNotAvailableError, LoanNotFoundError, LoanAlreadyReturnedError, ValidationError
+from app.exceptions import (
+    BookNotAvailableError,
+    LoanAccessDeniedError,
+    LoanAlreadyReturnedError,
+    LoanNotFoundError,
+    ValidationError,
+)
 from app.models.book import Edition
-from app.models.book import Edition
-from app.models.user import User
 from app.models.loan import Loan
+from app.models.user import User
 
 
 class LoanService:
     @staticmethod
-    def borrow(edition_id, user_id, days=None):
-        if not edition_id or not user_id:
-            raise ValidationError("Edición y usuario son obligatorios")
-        edition = Edition.get_or_fail(edition_id)
     def borrow(edition_id, user_id, days=None):
         if not edition_id or not user_id:
             raise ValidationError("Edición y usuario son obligatorios")
@@ -23,34 +24,30 @@ class LoanService:
             raise BookNotAvailableError(
                 f"'{edition.book.title}' no tiene ejemplares disponibles"
             )
-        days = days or current_app.config["LOAN_DAYS"]
+        if days is None:
+            days = current_app.config["LOAN_DAYS"]
+        if days < 1:
+            raise ValidationError("La duración del préstamo debe ser de al menos un día")
         loan = Loan(
             edition=edition,
             user=user,
             due_date=date.today() + timedelta(days=days),
         )
         edition.available_copies -= 1
-        if edition.available_copies < 1:
-            raise BookNotAvailableError(f"'{edition.book.title}' no tiene ejemplares disponibles en esta edición")
-        if days is None:
-            days = current_app.config["LOAN_DAYS"]
-        if days < 1:
-            raise ValidationError("La duración del préstamo debe ser de al menos un día")
-        loan = Loan(edition=edition, user=user, due_date=date.today() + timedelta(days=days))
-        edition.available_copies -= 1
         db.session.add(loan)
         db.session.commit()
         return loan
 
     @staticmethod
-    def return_book(loan_id):
+    def return_book(loan_id, user_id=None):
         loan = db.session.get(Loan, loan_id)
         if loan is None:
             raise LoanNotFoundError(f"El préstamo {loan_id} no existe")
+        if user_id is not None and loan.user_id != user_id:
+            raise LoanAccessDeniedError("No puedes devolver el préstamo de otro usuario")
         if loan.return_date:
             raise LoanAlreadyReturnedError("Este préstamo ya fue devuelto")
         loan.return_date = date.today()
-        loan.edition.available_copies += 1
         loan.edition.available_copies += 1
         db.session.commit()
         return loan

@@ -34,13 +34,16 @@
 
   <div class="ae-form-card" id="loans">
     <h5>Mis préstamos</h5>
+    {% if not active_loans %}
+    <p class="text-muted mb-3">No tienes préstamos activos. <a href="{{ url_for('catalog.index') }}">Explora el catálogo</a> para solicitar uno.</p>
+    {% endif %}
     <div class="table-responsive">
       <table class="table table-sm align-middle mb-0">
         <thead>
           <tr><th>Libro</th><th>Edición</th><th>Préstamo</th><th>Vence</th><th>Estado</th></tr>
         </thead>
         <tbody>
-          {% for l in user.loans | sort(attribute='loan_date', reverse=True) %}
+          {% for l in loans %}
           <tr>
             <td>{{ l.edition.book.title }}</td>
             <td>{{ l.edition.label }}</td>
@@ -50,12 +53,19 @@
               <span class="badge {{ 'bg-danger' if l.status in ('Atrasado', 'Devuelto con retraso') else ('bg-success' if l.return_date else 'bg-primary') }}">
                 {{ l.status }}
               </span>
+              {% if not l.return_date %}
+              <form method="post" action="{{ url_for('loans.return_loan', loan_id=l.id) }}" class="d-inline ms-2">
+                <button class="btn btn-sm btn-ae-light">
+                  <i class="bi bi-arrow-return-left"></i> Devolver
+                </button>
+              </form>
+              {% endif %}
             </td>
           </tr>
           {% else %}
           <tr>
             <td colspan="5" class="text-muted text-center py-4">
-              Aún no tienes préstamos. <a href="{{ url_for('catalog.index') }}">Explora el catálogo</a>.
+              Aún no tienes historial de préstamos. <a href="{{ url_for('catalog.index') }}">Explora el catálogo</a>.
             </td>
           </tr>
           {% endfor %}

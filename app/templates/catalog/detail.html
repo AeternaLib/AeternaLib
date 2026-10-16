@@ -43,7 +43,7 @@
       {% if is_logged_in %}
       <form method="post" action="{{ url_for('loans.borrow', edition_id=edition.id) }}">
         <button class="btn btn-ae btn-lg" {{ 'disabled' if not edition.available_copies }}>
-          <i class="bi bi-bag-plus"></i> Rentar
+          <i class="bi bi-bag-plus"></i> Pedir préstamo
         </button>
       </form>
       {% else %}
